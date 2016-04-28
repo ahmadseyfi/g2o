@@ -3,6 +3,13 @@ if(POLICY CMP0020)
   cmake_policy(SET CMP0020 OLD)
 endif()
 
+#we are adding these three lines to fix this problem https://github.com/tum-vision/dvo_slam/issues/21
+find_package(OpenGL REQUIRED)
+find_package(GLUT REQUIRED)
+include_directories( ${OPENGL_INCLUDE_DIRS} ${GLUT_INCLUDE_DIRS} )
+
+
+
 # Qt{4,5} have been find_package'd() by FindQGLViewer.cmake
 if(Qt4_FOUND)
   INCLUDE(${QT_USE_FILE})
@@ -45,7 +52,12 @@ SET_TARGET_PROPERTIES(g2o_viewer PROPERTIES OUTPUT_NAME g2o_viewer${EXE_POSTFIX}
 
 TARGET_LINK_LIBRARIES(viewer_library core g2o_cli_library ${QGLVIEWER_LIBRARY} ${MY_QT_LIBRARIES} ${OPENGL_LIBRARY})
 TARGET_LINK_LIBRARIES(viewer_library core opengl_helper)
-TARGET_LINK_LIBRARIES(g2o_viewer viewer_library)
+#replacing this line
+#TARGET_LINK_LIBRARIES(g2o_viewer viewer_library)
+
+#with this
+TARGET_LINK_LIBRARIES(g2o_viewer viewer_library ${OPENGL_LIBRARIES} ${GLUT_LIBRARY})
+#to fix this issue: https://github.com/tum-vision/dvo_slam/issues/21
 
 INSTALL(TARGETS g2o_viewer viewer_library
   RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
